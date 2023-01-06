@@ -17,11 +17,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-
-
-
-
-
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 
 
 @Composable
@@ -41,29 +38,53 @@ fun ProfilePage(){
 
 @Composable
 fun ProfilePageContent(){
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())){
+
+    ConstraintLayout(){
+
+        val (image, nameText, countryText, rowStats, buttonFollow, buttonDM) = createRefs()
+
+        val guideline = createGuidelineFromTop(0.1f)
+
         Image(
             painter = painterResource(id = R.drawable.dog),
             contentDescription = "Dog",
             modifier = Modifier
                 .size(100.dp)
                 .clip(CircleShape)
-                .border(width = 2.dp, color = Color.Black, shape = CircleShape),
+                .border(width = 2.dp, color = Color.Black, shape = CircleShape)
+                .constrainAs(image){
+                    top.linkTo(guideline)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                },
             contentScale = ContentScale.Crop
         )
 
-        Text( text = "Golden Retriever", fontWeight = FontWeight.Bold )
-        Text( text = "Brasil")
+        Text(
+            text = "Golden Retriever",
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.constrainAs(nameText){
+                top.linkTo(image.bottom)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+            }
+        )
+        Text(
+            text = "Brasil",
+            modifier = Modifier.constrainAs(countryText){
+                top.linkTo(nameText.bottom)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+            }
+        )
 
         Row(horizontalArrangement = Arrangement.SpaceEvenly,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
+                .constrainAs(rowStats){
+                    top.linkTo(countryText.bottom)
+                }
         ) {
 
             ProfileStats(count = "150", title = "Followers")
@@ -71,18 +92,27 @@ fun ProfilePageContent(){
             ProfileStats(count = "30", title = "Posts")
         }
 
-
-        Row(horizontalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Button(onClick = {}){
-                Text(text = "Follow User")
+        Button(
+            onClick = {},
+            modifier = Modifier.constrainAs(buttonFollow){
+                top.linkTo(rowStats.bottom, margin = 16.dp)
+                start.linkTo(parent.start)
+                end.linkTo(buttonDM.start)
+                width = Dimension.wrapContent
             }
-            Button(onClick = {}){
-                Text(text = "Direct Message")
+        ){
+            Text(text = "Follow User")
+        }
+        Button(
+            onClick = {},
+            modifier = Modifier.constrainAs(buttonDM){
+                top.linkTo(rowStats.bottom, margin = 16.dp)
+                start.linkTo(buttonFollow.end)
+                end.linkTo(parent.end)
+                width = Dimension.wrapContent
             }
+        ){
+            Text(text = "Direct Message")
         }
     }
 }
